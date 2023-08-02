@@ -75,6 +75,8 @@ class BaseDescent:
         :return: loss: float
         """
         # TODO: implement loss calculation function
+        l = x.shape[0]
+        return (1/l)*((y-x@self.w).T)@(y-x@self.w)
         raise NotImplementedError('BaseDescent calc_loss function not implemented')
 
     def predict(self, x: np.ndarray) -> np.ndarray:
@@ -84,6 +86,7 @@ class BaseDescent:
         :return: prediction: np.ndarray
         """
         # TODO: implement prediction function
+        return x@self.w
         raise NotImplementedError('BaseDescent predict function not implemented')
 
 
@@ -91,15 +94,16 @@ class VanillaGradientDescent(BaseDescent):
     """
     Full gradient descent class
     """
-
     def update_weights(self, gradient: np.ndarray) -> np.ndarray:
         """
         :return: weight difference (w_{k + 1} - w_k): np.ndarray
         """
         # TODO: implement updating weights function
+        return -self.lr() * gradient
         raise NotImplementedError('VanillaGradientDescent update_weights function not implemented')
 
     def calc_gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        return (np.linalg.inv(x.T@x))@(x.T@y)
         # TODO: implement calculating gradient function
         raise NotImplementedError('VanillaGradientDescent calc_gradient function not implemented')
 
@@ -119,6 +123,13 @@ class StochasticDescent(VanillaGradientDescent):
 
     def calc_gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         # TODO: implement calculating gradient function
+        idx = np.random.randint(x.shape[0], size=self.batch_size)
+        #print(idx)
+
+        X_batch = x[idx]
+        y_batch = y[idx]
+
+        return np.linalg.inv((X_batch.T @ X_batch)) * (X_batch.T @ y_batch)
         raise NotImplementedError('StochasticDescent calc_gradient function not implemented')
 
 
