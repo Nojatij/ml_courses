@@ -34,6 +34,21 @@ class LinearRegression:
         :return: self
         """
         # TODO: fit weights to x and y
+        self.loss_history += [self.calc_loss(x,y)]
+        zero_step_weights = self.descent.step(x,y)
+        tolerance = (np.linalg.norm(zero_step_weights, ord = 2))**2
+        is_diff_nan = np.isnan(zero_step_weights).sum()
+        self.max_iter -= 1
+        
+        while (self.max_iter > 0 and  is_diff_nan == 0 and self.tolerance < tolerance):
+            self.loss_history += [self.calc_loss(x,y)]
+            old_w = self.descent.w
+            zero_step_weights = self.descent.step(x,y)
+            tolerance = (np.linalg.norm(zero_step_weights, ord = 2))**2
+            is_diff_nan = np.isnan(zero_step_weights).sum()
+            self.max_iter -= 1 
+        self.loss_history += [self.descent.calc_loss(x,y)]
+        return self
         raise NotImplementedError('LinearRegression fit function not implemented')
 
     def predict(self, x: np.ndarray) -> np.ndarray:
