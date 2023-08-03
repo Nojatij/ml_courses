@@ -76,7 +76,8 @@ class BaseDescent:
         """
         # TODO: implement loss calculation function
         l = x.shape[0]
-        return (1/l)*((y-x@self.w).T)@(y-x@self.w)
+        return 1/l *((y - x @ self.w).T * (y - x @ self.w))
+
         raise NotImplementedError('BaseDescent calc_loss function not implemented')
 
     def predict(self, x: np.ndarray) -> np.ndarray:
@@ -86,7 +87,9 @@ class BaseDescent:
         :return: prediction: np.ndarray
         """
         # TODO: implement prediction function
-        return x@self.w
+
+        return x @ self.w
+
         raise NotImplementedError('BaseDescent predict function not implemented')
 
 
@@ -94,17 +97,21 @@ class VanillaGradientDescent(BaseDescent):
     """
     Full gradient descent class
     """
+
     def update_weights(self, gradient: np.ndarray) -> np.ndarray:
         """
         :return: weight difference (w_{k + 1} - w_k): np.ndarray
         """
         # TODO: implement updating weights function
+
         return -self.lr() * gradient
+    
         raise NotImplementedError('VanillaGradientDescent update_weights function not implemented')
 
     def calc_gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-        return (np.linalg.inv(x.T@x))@(x.T@y)
         # TODO: implement calculating gradient function
+        return np.linalg.inv((x.T @ x)) * (x.T @ y)
+
         raise NotImplementedError('VanillaGradientDescent calc_gradient function not implemented')
 
 
@@ -123,6 +130,7 @@ class StochasticDescent(VanillaGradientDescent):
 
     def calc_gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         # TODO: implement calculating gradient function
+
         idx = np.random.randint(x.shape[0], size=self.batch_size)
         #print(idx)
 
@@ -130,6 +138,7 @@ class StochasticDescent(VanillaGradientDescent):
         y_batch = y[idx]
 
         return np.linalg.inv((X_batch.T @ X_batch)) * (X_batch.T @ y_batch)
+
         raise NotImplementedError('StochasticDescent calc_gradient function not implemented')
 
 
@@ -149,6 +158,9 @@ class MomentumDescent(VanillaGradientDescent):
         :return: weight difference (w_{k + 1} - w_k): np.ndarray
         """
         # TODO: implement updating weights function
+        
+        return - (self.alpha * self.h + self.lr() * gradient)
+
         raise NotImplementedError('MomentumDescent update_weights function not implemented')
 
 
@@ -174,6 +186,15 @@ class Adam(VanillaGradientDescent):
         :return: weight difference (w_{k + 1} - w_k): np.ndarray
         """
         # TODO: implement updating weights function
+
+        self.m = self.beta_1 * self.m + (1 - self.beta_1) * gradient
+        self.v = self.beta_2 * self.v + (1 - self.beta_2) * (gradient ** 2)
+
+        m_hat = self.m / (1 - self.beta_1 ** self.iteration)
+        v_hat = self.v / (1 - self.beta_2 ** self.iteration)
+
+        return - self.lr() * m_hat / (np.sqrt(v_hat) + self.eps)
+
         raise NotImplementedError('Adagrad update_weights function not implemented')
 
 
